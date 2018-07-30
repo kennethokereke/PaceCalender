@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.simplemobiletools.calendar.R
 import com.simplemobiletools.calendar.activities.SimpleActivity
+import com.simplemobiletools.calendar.config.Constants
 import com.simplemobiletools.calendar.dialogs.DeleteEventDialog
 import com.simplemobiletools.calendar.extensions.config
 import com.simplemobiletools.calendar.extensions.dbHelper
@@ -16,6 +17,7 @@ import com.simplemobiletools.calendar.helpers.getNowSeconds
 import com.simplemobiletools.calendar.models.ListEvent
 import com.simplemobiletools.calendar.models.ListItem
 import com.simplemobiletools.calendar.models.ListSection
+import com.simplemobiletools.calendar.savingpref.TinyDB
 import com.simplemobiletools.commons.adapters.MyRecyclerViewAdapter
 import com.simplemobiletools.commons.extensions.adjustAlpha
 import com.simplemobiletools.commons.extensions.applyColorFilter
@@ -25,10 +27,13 @@ import com.simplemobiletools.commons.interfaces.RefreshRecyclerViewListener
 import com.simplemobiletools.commons.views.MyRecyclerView
 import kotlinx.android.synthetic.main.event_list_item.view.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListItem>, val allowLongClick: Boolean, val listener: RefreshRecyclerViewListener?,
                        recyclerView: MyRecyclerView, itemClick: (Any) -> Unit) : MyRecyclerViewAdapter(activity, recyclerView, null, itemClick) {
 
+
+    lateinit var tinyDB:TinyDB
     private val ITEM_EVENT = 0
     private val ITEM_EVENT_SIMPLE = 1
     private val ITEM_HEADER = 2
@@ -203,6 +208,12 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
     }
 
     private fun askConfirmDelete() {
+
+
+
+
+
+
         val eventIds = ArrayList<Int>(selectedPositions.size)
         val timestamps = ArrayList<Int>(selectedPositions.size)
         val eventsToDelete = ArrayList<ListEvent>(selectedPositions.size)
@@ -216,8 +227,32 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
             }
         }
 
+//        tinyDB= TinyDB(activity)
+//        var x=eventsToDelete.get(0).startTS
+//      //  var stringArrayList: MutableList<Int> = mutableListOf<Int>()
+//        var stringArrayList = ArrayList<Int>()
+//        stringArrayList= tinyDB.getListInt(Constants.PREF_Start_time)
+//        for (i in stringArrayList.indices) {
+//            if (stringArrayList[i] == x) {
+//
+//                stringArrayList.remove(i)
+//                var stringArrayList1 =stringArrayList
+//
+//                        tinyDB.putListInt(Constants.PREF_Start_time,stringArrayList1)
+//
+//
+//                break
+//
+//            }
+//        }
+
+
+
+
+
         val hasRepeatableEvent = eventsToDelete.any { it.isRepeatable }
         DeleteEventDialog(activity, eventIds, hasRepeatableEvent) {
+
             listItems.removeAll(eventsToDelete)
 
             val nonRepeatingEventIDs = eventsToDelete.filter { !it.isRepeatable }.map { it.id.toString() }.toTypedArray()

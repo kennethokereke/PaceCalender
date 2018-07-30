@@ -404,6 +404,26 @@ class DBHelper private constructor(val context: Context) : SQLiteOpenHelper(cont
         return -1
     }
 
+
+    fun getEventTypeIdWithTime(title: String): Int {
+     //   adfasdfasdf
+        val cols = arrayOf(COL_START_TS)
+        val selection = "$COL_START_TS = ?"
+        val selectionArgs = arrayOf(title)
+        var cursor: Cursor? = null
+        try {
+            cursor = mDb.query(MAIN_TABLE_NAME, cols, selection, selectionArgs, null, null, null)
+            if (cursor?.moveToFirst() == true) {
+                return cursor.getIntValue(COL_START_TS)
+            }
+        } finally {
+            cursor?.close()
+        }
+        return -1
+    }
+
+
+
     fun getEventTypeWithCalDAVCalendarId(calendarId: Int): EventType? {
         val cols = arrayOf(COL_TYPE_ID)
         val selection = "$COL_TYPE_CALDAV_CALENDAR_ID = ?"

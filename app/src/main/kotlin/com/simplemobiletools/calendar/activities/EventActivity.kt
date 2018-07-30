@@ -6,17 +6,22 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.DatePicker
+import android.widget.Toast
 import com.simplemobiletools.calendar.R
+import com.simplemobiletools.calendar.config.Constants
 import com.simplemobiletools.calendar.dialogs.*
 import com.simplemobiletools.calendar.extensions.*
 import com.simplemobiletools.calendar.helpers.*
 import com.simplemobiletools.calendar.helpers.Formatter
 import com.simplemobiletools.calendar.models.CalDAVCalendar
 import com.simplemobiletools.calendar.models.Event
+import com.simplemobiletools.calendar.savingpref.TinyDB
 import com.simplemobiletools.commons.dialogs.ConfirmationDialog
 import com.simplemobiletools.commons.dialogs.RadioGroupDialog
 import com.simplemobiletools.commons.extensions.*
@@ -45,9 +50,13 @@ class EventActivity : SimpleActivity() {
     lateinit var mEventEndDateTime: DateTime
     lateinit var mEvent: Event
 
+    private lateinit var tinyDB:TinyDB
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event)
+
+        tinyDB=TinyDB(applicationContext)
 
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_cross)
         val intent = intent ?: return
@@ -577,6 +586,25 @@ class EventActivity : SimpleActivity() {
     }
 
     private fun deleteEvent() {
+
+        var x=mEvent.getEventStartTS()
+//        var stringArrayList: MutableList<Int> = mutableListOf<Int>()
+        var stringArrayList = ArrayList<Int>()
+        stringArrayList= tinyDB.getListInt(Constants.PREF_Start_time)
+        for (i in stringArrayList.indices) {
+            if (stringArrayList[i] == x) {
+
+                stringArrayList.remove(i)
+                var stringArrayList1 =stringArrayList
+                tinyDB.putListInt(Constants.PREF_Start_time,stringArrayList1)
+
+
+                break
+
+            }
+        }
+
+
         DeleteEventDialog(this, arrayListOf(mEvent.id), mEvent.repeatInterval > 0) {
             when (it) {
                 DELETE_SELECTED_OCCURRENCE -> dbHelper.addEventRepeatException(mEvent.id, mEventOccurrenceTS, true)
@@ -598,6 +626,8 @@ class EventActivity : SimpleActivity() {
     }
 
     private fun saveEvent() {
+//        var isChecked:Boolean
+//        isChecked=true
         val newTitle = event_title.value
         if (newTitle.isEmpty()) {
             toast(R.string.title_empty)
@@ -606,70 +636,107 @@ class EventActivity : SimpleActivity() {
         }
 
         val newStartTS = mEventStartDateTime.withSecondOfMinute(0).withMillisOfSecond(0).seconds()
-        val newEndTS = mEventEndDateTime.withSecondOfMinute(0).withMillisOfSecond(0).seconds()
 
-        if (newStartTS > newEndTS) {
-            toast(R.string.end_before_start)
-            return
+//        var stringArrayList = ArrayList<Int>()
+//      stringArrayList= tinyDB.getListInt(Constants.PREF_Start_time)
+//
+//        for (i in stringArrayList.indices) {
+//            if (stringArrayList[i] == newStartTS) {
+//                toast("Time is given before")
+//
+//                isChecked = false
+//                break
+//
+//            }
+//        }
+
+//        if (stringArrayList.size==0){
+//            isChecked=true
+//        }
+
+     var x= dbHelper.getEventTypeIdWithTime(newStartTS.toString())
+
+            if(x==-1){
+
+//                stringArrayList.add(newStartTS)
+//                tinyDB.putListInt(Constants.PREF_Start_time,stringArrayList)
+
+             val newEndTS = mEventEndDateTime.withSecondOfMinute(0).withMillisOfSecond(0).seconds()
+
+             if (newStartTS > newEndTS) {
+                 toast(R.string.end_before_start)
+                 return
+             }
+
+             val wasRepeatable = mEvent.repeatInterval > 0
+             val oldSource = mEvent.source
+             val newImportId = if (mEvent.id != 0) mEvent.importId else UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
+
+             val newEventType = if (!config.caldavSync || config.lastUsedCaldavCalendarId == 0 || mEventCalendarId == STORED_LOCALLY_ONLY) {
+                 mEventTypeId
+             } else {
+                 dbHelper.getEventTypeWithCalDAVCalendarId(config.lastUsedCaldavCalendarId)?.id
+                         ?: config.lastUsedLocalEventTypeId
+             }
+
+             val newSource = if (!config.caldavSync || config.lastUsedCaldavCalendarId == 0 || mEventCalendarId == STORED_LOCALLY_ONLY) {
+                 config.lastUsedLocalEventTypeId = newEventType
+                 SOURCE_SIMPLE_CALENDAR
+             } else {
+                 "$CALDAV-${config.lastUsedCaldavCalendarId}"
+             }
+
+             val reminders = sortedSetOf(mReminder1Minutes, mReminder2Minutes, mReminder3Minutes).filter { it != REMINDER_OFF }
+             val reminder1 = reminders.getOrElse(0) { REMINDER_OFF }
+             val reminder2 = reminders.getOrElse(1) { REMINDER_OFF }
+             val reminder3 = reminders.getOrElse(2) { REMINDER_OFF }
+
+             config.apply {
+                 defaultReminderMinutes = reminder1
+                 defaultReminderMinutes2 = reminder2
+                 defaultReminderMinutes3 = reminder3
+             }
+
+             mEvent.apply {
+
+                 startTS = newStartTS
+                 endTS = newEndTS
+                 title = newTitle
+                 description = event_description.value
+                 reminder1Minutes = reminder1
+                 reminder2Minutes = reminder2
+                 reminder3Minutes = reminder3
+                 repeatInterval = mRepeatInterval
+                 importId = newImportId
+                 flags = if (event_all_day.isChecked) (mEvent.flags.addBit(FLAG_ALL_DAY)) else (mEvent.flags.removeBit(FLAG_ALL_DAY))
+                 repeatLimit = if (repeatInterval == 0) 0 else mRepeatLimit
+                 repeatRule = mRepeatRule
+                 eventType = newEventType
+                 offset = getCurrentOffset()
+                 isDstIncluded = TimeZone.getDefault().inDaylightTime(Date())
+                 lastUpdated = System.currentTimeMillis()
+                 source = newSource
+                 location = event_location.value
+             }
+
+             // recreate the event if it was moved in a different CalDAV calendar
+             if (mEvent.id != 0 && oldSource != newSource) {
+                 dbHelper.deleteEvents(arrayOf(mEvent.id.toString()), true)
+                 mEvent.id = 0
+             }
+
+             storeEvent(wasRepeatable)
+         }else{
+                toast("Time is given before")
+            }
+
+
+
         }
 
-        val wasRepeatable = mEvent.repeatInterval > 0
-        val oldSource = mEvent.source
-        val newImportId = if (mEvent.id != 0) mEvent.importId else UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
 
-        val newEventType = if (!config.caldavSync || config.lastUsedCaldavCalendarId == 0 || mEventCalendarId == STORED_LOCALLY_ONLY) {
-            mEventTypeId
-        } else {
-            dbHelper.getEventTypeWithCalDAVCalendarId(config.lastUsedCaldavCalendarId)?.id ?: config.lastUsedLocalEventTypeId
-        }
 
-        val newSource = if (!config.caldavSync || config.lastUsedCaldavCalendarId == 0 || mEventCalendarId == STORED_LOCALLY_ONLY) {
-            config.lastUsedLocalEventTypeId = newEventType
-            SOURCE_SIMPLE_CALENDAR
-        } else {
-            "$CALDAV-${config.lastUsedCaldavCalendarId}"
-        }
 
-        val reminders = sortedSetOf(mReminder1Minutes, mReminder2Minutes, mReminder3Minutes).filter { it != REMINDER_OFF }
-        val reminder1 = reminders.getOrElse(0) { REMINDER_OFF }
-        val reminder2 = reminders.getOrElse(1) { REMINDER_OFF }
-        val reminder3 = reminders.getOrElse(2) { REMINDER_OFF }
-
-        config.apply {
-            defaultReminderMinutes = reminder1
-            defaultReminderMinutes2 = reminder2
-            defaultReminderMinutes3 = reminder3
-        }
-
-        mEvent.apply {
-            startTS = newStartTS
-            endTS = newEndTS
-            title = newTitle
-            description = event_description.value
-            reminder1Minutes = reminder1
-            reminder2Minutes = reminder2
-            reminder3Minutes = reminder3
-            repeatInterval = mRepeatInterval
-            importId = newImportId
-            flags = if (event_all_day.isChecked) (mEvent.flags.addBit(FLAG_ALL_DAY)) else (mEvent.flags.removeBit(FLAG_ALL_DAY))
-            repeatLimit = if (repeatInterval == 0) 0 else mRepeatLimit
-            repeatRule = mRepeatRule
-            eventType = newEventType
-            offset = getCurrentOffset()
-            isDstIncluded = TimeZone.getDefault().inDaylightTime(Date())
-            lastUpdated = System.currentTimeMillis()
-            source = newSource
-            location = event_location.value
-        }
-
-        // recreate the event if it was moved in a different CalDAV calendar
-        if (mEvent.id != 0 && oldSource != newSource) {
-            dbHelper.deleteEvents(arrayOf(mEvent.id.toString()), true)
-            mEvent.id = 0
-        }
-
-        storeEvent(wasRepeatable)
-    }
 
     private fun storeEvent(wasRepeatable: Boolean) {
         if (mEvent.id == 0) {
@@ -791,7 +858,14 @@ class EventActivity : SimpleActivity() {
 
     private fun setupStartTime() {
         hideKeyboard()
-        TimePickerDialog(this, mDialogTheme, startTimeSetListener, mEventStartDateTime.hourOfDay, mEventStartDateTime.minuteOfHour, config.use24HourFormat).show()
+ //       TimePickerDialog(this, mDialogTheme, startTimeSetListener, mEventStartDateTime.hourOfDay, mEventStartDateTime.minuteOfHour, config.use24HourFormat).show()
+//
+//        TimePickerDialog(this, android.R.style.Theme_Holo_Light_Dialog, startTimeSetListener, mEventStartDateTime.hourOfDay, mEventStartDateTime.minuteOfHour, config.use24HourFormat).show()
+//
+
+        TimePickerDialog(this, R.style.DialogCustomTheme, startTimeSetListener, mEventStartDateTime.hourOfDay, mEventStartDateTime.minuteOfHour, config.use24HourFormat).show()
+
+
     }
 
     @SuppressLint("NewApi")
@@ -809,7 +883,11 @@ class EventActivity : SimpleActivity() {
 
     private fun setupEndTime() {
         hideKeyboard()
-        TimePickerDialog(this, mDialogTheme, endTimeSetListener, mEventEndDateTime.hourOfDay, mEventEndDateTime.minuteOfHour, config.use24HourFormat).show()
+//        TimePickerDialog(this, mDialogTheme, endTimeSetListener, mEventEndDateTime.hourOfDay, mEventEndDateTime.minuteOfHour, config.use24HourFormat).show()
+//
+        TimePickerDialog(this,R.style.DialogCustomTheme, endTimeSetListener, mEventEndDateTime.hourOfDay, mEventEndDateTime.minuteOfHour, config.use24HourFormat).show()
+
+
     }
 
     private val startDateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->

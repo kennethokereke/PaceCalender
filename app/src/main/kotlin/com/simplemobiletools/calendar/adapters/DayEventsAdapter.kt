@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.simplemobiletools.calendar.R
 import com.simplemobiletools.calendar.activities.SimpleActivity
+import com.simplemobiletools.calendar.config.Constants
 import com.simplemobiletools.calendar.dialogs.DeleteEventDialog
 import com.simplemobiletools.calendar.extensions.config
 import com.simplemobiletools.calendar.extensions.dbHelper
@@ -13,6 +14,7 @@ import com.simplemobiletools.calendar.extensions.shareEvents
 import com.simplemobiletools.calendar.helpers.Formatter
 import com.simplemobiletools.calendar.helpers.LOW_ALPHA
 import com.simplemobiletools.calendar.models.Event
+import com.simplemobiletools.calendar.savingpref.TinyDB
 import com.simplemobiletools.commons.adapters.MyRecyclerViewAdapter
 import com.simplemobiletools.commons.extensions.adjustAlpha
 import com.simplemobiletools.commons.extensions.applyColorFilter
@@ -23,7 +25,7 @@ import kotlinx.android.synthetic.main.event_item_day_view.view.*
 
 class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit)
     : MyRecyclerViewAdapter(activity, recyclerView, null, itemClick) {
-
+    lateinit var tinyDB:TinyDB
     private val allDayString = resources.getString(R.string.all_day)
     private val replaceDescriptionWithLocation = activity.config.replaceDescription
     private val dimPastEvents = activity.config.dimPastEvents
@@ -121,6 +123,30 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
             eventIds.add(event.id)
             timestamps.add(event.startTS)
         }
+
+//        tinyDB= TinyDB(activity)
+//        var x=eventsToDelete.get(0).getEventStartTS()
+//      //  var stringArrayList: MutableList<Int> = mutableListOf<Int>()
+//        var stringArrayList = ArrayList<Int>()
+//        stringArrayList= tinyDB.getListInt(Constants.PREF_Start_time)
+//        for (i in stringArrayList.indices) {
+//            if (stringArrayList[i] == x) {
+//
+//                stringArrayList.remove(i)
+//                var stringArrayList1 = stringArrayList
+//
+//                tinyDB.putListInt(Constants.PREF_Start_time,stringArrayList1)
+//
+//
+//                break
+//
+//            }
+//        }
+
+
+
+
+
 
         val hasRepeatableEvent = eventsToDelete.any { it.repeatInterval > 0 }
         DeleteEventDialog(activity, eventIds, hasRepeatableEvent) {

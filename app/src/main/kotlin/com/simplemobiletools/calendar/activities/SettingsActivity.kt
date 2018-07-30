@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.os.Bundle
 import android.text.TextUtils
 import com.simplemobiletools.calendar.R
+import com.simplemobiletools.calendar.config.Constants
 import com.simplemobiletools.calendar.dialogs.SelectCalendarsDialog
 import com.simplemobiletools.calendar.extensions.*
 import com.simplemobiletools.calendar.helpers.CalDAVHandler
@@ -13,6 +14,7 @@ import com.simplemobiletools.calendar.helpers.FONT_SIZE_LARGE
 import com.simplemobiletools.calendar.helpers.FONT_SIZE_MEDIUM
 import com.simplemobiletools.calendar.helpers.FONT_SIZE_SMALL
 import com.simplemobiletools.calendar.models.EventType
+import com.simplemobiletools.calendar.savingpref.TinyDB
 import com.simplemobiletools.commons.dialogs.ConfirmationDialog
 import com.simplemobiletools.commons.dialogs.CustomIntervalPickerDialog
 import com.simplemobiletools.commons.dialogs.RadioGroupDialog
@@ -29,13 +31,15 @@ import java.util.*
 
 class SettingsActivity : SimpleActivity() {
     private val GET_RINGTONE_URI = 1
-
+    lateinit var tinyDB:TinyDB
     lateinit var res: Resources
     private var mStoredPrimaryColor = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        tinyDB= TinyDB(applicationContext)
+
         res = resources
         mStoredPrimaryColor = config.primaryColor
         setupCaldavSync()
@@ -225,6 +229,13 @@ class SettingsActivity : SimpleActivity() {
     }
 
     private fun setupDeleteAllEvents() {
+
+
+        var stringArrayList: MutableList<Int> = mutableListOf<Int>()
+        //var stringArrayList = MutableList<Int>()
+        stringArrayList.clear()
+      tinyDB.putListInt(Constants.PREF_Start_time, stringArrayList as ArrayList<Int>?)
+
         settings_delete_all_events_holder.setOnClickListener {
             ConfirmationDialog(this, messageId = R.string.delete_all_events_confirmation) {
                 Thread {

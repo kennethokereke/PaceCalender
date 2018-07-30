@@ -29,4 +29,9 @@
     <style name="MonthStyle">
         <item name="android:background">@drawable/transparent_button</item>
     </style>
+
+    <style name="DialogCustomTheme" parent="android:Theme.Holo.Light.Dialog">
+        <item name="android:windowBackground">@color/Trans</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
 </resources>
