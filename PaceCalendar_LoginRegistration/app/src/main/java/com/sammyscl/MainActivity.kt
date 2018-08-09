@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
 
         if (SaveSharedPreference.getUserName(this@MainActivity).isEmpty()) {
             if (savedInstanceState == null) {
-
-
                 loadLoginFragment()
             }
         } else {
@@ -35,9 +33,9 @@ class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
 
     private fun loadLoginFragment() {
         if (mLoginFragment == null) {
-
             mLoginFragment = LoginFragment()
         }
+
         fragmentManager.beginTransaction().replace(R.id.fragmentFrame, mLoginFragment, LoginFragment.TAG).commit()
     }
 
@@ -62,6 +60,6 @@ class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
     }
 
     companion object {
-        val TAG = MainActivity::class.java!!.getSimpleName()
+        val TAG = MainActivity::class.java.getSimpleName()
     }
 }

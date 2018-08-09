@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.simplemobiletools:commons-4.3.28">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/commons-4.3.28.aar/c0c9e5c4a38c28c7a034676e52df984a/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/commons-4.3.28.aar/c0c9e5c4a38c28c7a034676e52df984a/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/commons-4.3.28.aar/abc1f26a51344502eba579b30b2cd458/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/commons-4.3.28.aar/abc1f26a51344502eba579b30b2cd458/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
