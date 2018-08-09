@@ -3,6 +3,7 @@ package com.sammyscl.calendar.activities
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.database.ContentObserver
 import android.database.Cursor
@@ -10,6 +11,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.provider.ContactsContract
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.SearchView
@@ -17,6 +19,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.sammyscl.BuildConfig
+import com.sammyscl.Helpers.Constants
+import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.R
 
 import com.sammyscl.calendar.adapters.EventListAdapter
@@ -66,6 +70,8 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     private var mStoredUse24HourFormat = false
     private var mStoredDimPastEvents = true
 
+    private var mSharedPreferences: SharedPreferences ?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_cal)
@@ -100,6 +106,8 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
         if (config.caldavSync) {
             refreshCalDAVCalendars(false)
         }
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     override fun onResume() {
@@ -175,10 +183,20 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
             R.id.export_events -> tryExportEvents()
             R.id.settings -> launchSettings()
             R.id.about -> launchAbout()
+            R.id.logout -> logout()
             android.R.id.home -> onBackPressed()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    private fun logout() {
+        val editor = mSharedPreferences!!.edit()
+        editor.putString(Constants.EMAIL, "")
+        editor.putString(Constants.TOKEN, "")
+        editor.apply()
+        SaveSharedPreference.setUserName(applicationContext, "")
+        finish()
     }
 
     override fun onBackPressed() {
