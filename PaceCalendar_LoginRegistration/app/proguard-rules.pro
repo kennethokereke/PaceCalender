@@ -16,3 +16,11 @@
 #   public *;
 #}
 -keep class com.simplemobiletools.calendar.models.** { *; }
+-keep @interface android.support.annotation.Keep
+-keep @android.support.annotation.Keep class *
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <fields>;
+}
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <methods>;
+}

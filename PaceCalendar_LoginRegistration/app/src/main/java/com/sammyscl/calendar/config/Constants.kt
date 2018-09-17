@@ -9,6 +9,6 @@ package com.sammyscl.calendar.config
     val PREF_End_time = "PREF_End_time"
 
     val PREF_late_audio_text = "PREF_late_audio_text"
-
+    val tutorial_view = "tutorial_alert"
 
 }
