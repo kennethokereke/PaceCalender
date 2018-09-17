@@ -71,6 +71,11 @@ class LoginFragment : Fragment() {
         mBtLogin!!.setOnClickListener { view -> login() }
         mTvRegister!!.setOnClickListener { view -> goToRegister() }
         mTvForgotPassword!!.setOnClickListener { view -> showDialog() }
+
+//////
+//        val intent = Intent(activity, SplashActivity::class.java)
+//        startActivity(intent)
+
     }
 
     private fun initSharedPreferences() {

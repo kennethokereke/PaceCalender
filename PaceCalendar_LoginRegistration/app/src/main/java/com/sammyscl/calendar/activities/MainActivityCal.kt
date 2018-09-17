@@ -1,5 +1,6 @@
 package com.sammyscl.calendar.activities
 
+import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.content.pm.ActivityInfo
 import android.database.ContentObserver
 import android.database.Cursor
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -17,13 +19,21 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.Toast
 import com.sammyscl.BuildConfig
 import com.sammyscl.Helpers.Constants
 import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.R
+import com.sammyscl.TinyDB
 
 import com.sammyscl.calendar.adapters.EventListAdapter
+import com.sammyscl.calendar.config.Constants.tutorial_view
 import com.sammyscl.calendar.dialogs.ExportEventsDialog
 import com.sammyscl.calendar.dialogs.FilterEventTypesDialog
 import com.sammyscl.calendar.dialogs.ImportEventsDialog
@@ -34,6 +44,8 @@ import com.sammyscl.calendar.helpers.Formatter
 import com.sammyscl.calendar.models.Event
 import com.sammyscl.calendar.models.EventType
 import com.sammyscl.calendar.models.ListEvent
+import com.sammyscl.tutorial.TourActivity
+import com.sammyscl.tutorial.TutActivity
 import com.simplemobiletools.commons.dialogs.FilePickerDialog
 import com.simplemobiletools.commons.dialogs.RadioGroupDialog
 import com.simplemobiletools.commons.extensions.*
@@ -50,6 +62,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
+
+    private var tinyDB: TinyDB? = null
+
+    private var is_check_nav:Boolean = false
+
     private val CALDAV_SYNC_DELAY = 1000L
 
     private var showCalDAVRefreshToast = false
@@ -72,6 +89,23 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
 
     private var mSharedPreferences: SharedPreferences ?= null
 
+    internal lateinit var rel_drawer: RelativeLayout
+    internal lateinit var rel_blur:RelativeLayout
+
+
+    internal lateinit var lin_schedule:LinearLayout
+    internal lateinit var lin_day:LinearLayout
+    internal lateinit var lin_week:LinearLayout
+    internal lateinit var lin_month:LinearLayout
+    internal lateinit var lin_team:LinearLayout
+    internal lateinit var lin_Setting:LinearLayout
+    internal lateinit var lin_year:LinearLayout
+    internal lateinit var lin_logout:LinearLayout
+
+
+    internal lateinit var img_nav: ImageView
+    internal lateinit var img_back:ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_cal)
@@ -80,10 +114,31 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
         // just get a reference to the database to make sure it is created properly
         dbHelper
 
+        tinyDB = TinyDB(this@MainActivityCal)
+
+//        val intent = Intent(this, TutActivity::class.java)
+//        startActivity(intent)
+        if (tinyDB!!.getBoolean(tutorial_view)){
+
+        }else {
+            val intent = Intent(this, TutActivity::class.java)
+            startActivity(intent)
+
+            tinyDB?.putBoolean(tutorial_view,true)
+        }
+
         checkWhatsNewDialog()
         calendar_fab.beVisibleIf(config.storedView != YEARLY_VIEW)
         calendar_fab.setOnClickListener {
-            launchNewEventIntent(currentFragments.last().getNewEventDayCode())
+
+        //    if (tinyDB!!.getBoolean(tutorial_view)){
+                launchNewEventIntent(currentFragments.last().getNewEventDayCode())
+        //    }else {
+
+         //       showMyAlertTutorial()
+          //  }
+
+
         }
 
         storeStateVariables()
@@ -108,6 +163,117 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
         }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+
+        ///////////////
+
+        supportActionBar?.title = ""
+        rel_blur = findViewById(R.id.rel_blur)
+        rel_drawer = findViewById(R.id.rel_drawer)
+        img_back = findViewById(R.id.img_back)
+
+        lin_schedule = findViewById(R.id.lin_schedule)
+        lin_day= findViewById(R.id.lin_day)
+        lin_week= findViewById(R.id.lin_week)
+        lin_month= findViewById(R.id.lin_month)
+        lin_team= findViewById(R.id.lin_team)
+        lin_Setting= findViewById(R.id.lin_Setting)
+        lin_year= findViewById(R.id.lin_year)
+        lin_logout=findViewById(R.id.lin_logout)
+
+
+        lin_schedule.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+        }
+
+        lin_day.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+
+                calendar_fab.beVisibleIf(DAILY_VIEW as Int != YEARLY_VIEW)
+                resetActionBarTitle()
+                closeSearch()
+                updateView(DAILY_VIEW)
+                shouldGoToTodayBeVisible = false
+                invalidateOptionsMenu()
+
+
+        }
+
+        lin_week.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+            calendar_fab.beVisibleIf(WEEKLY_VIEW as Int != YEARLY_VIEW)
+            resetActionBarTitle()
+            closeSearch()
+            updateView(WEEKLY_VIEW)
+            shouldGoToTodayBeVisible = false
+            invalidateOptionsMenu()
+        }
+
+        lin_month.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+            calendar_fab.beVisibleIf(MONTHLY_VIEW as Int != YEARLY_VIEW)
+            resetActionBarTitle()
+            closeSearch()
+            updateView(MONTHLY_VIEW)
+            shouldGoToTodayBeVisible = false
+            invalidateOptionsMenu()
+        }
+
+
+        lin_year.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+            calendar_fab.beVisibleIf(YEARLY_VIEW as Int != YEARLY_VIEW)
+            resetActionBarTitle()
+            closeSearch()
+            updateView(YEARLY_VIEW)
+            shouldGoToTodayBeVisible = false
+            invalidateOptionsMenu()
+        }
+
+        lin_team.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+        }
+
+        lin_Setting.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+
+            launchSettings()
+        }
+
+
+        lin_logout.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+            logout()
+        }
+
+
+        img_back.setOnClickListener {
+            slideToleft()
+            is_check_nav=false
+        }
+
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+
+      //  supportActionBar?.setIcon(R.drawable.dog)
+
+
+//        val intent = Intent(this, TutActivity::class.java)
+//        startActivity(intent)
+        ////////////
     }
 
     override fun onResume() {
@@ -172,18 +338,29 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.change_view -> showViewDialog()
+            R.id.img_nav->{
+                if (is_check_nav){
+                    slideToleft()
+                    is_check_nav=false
+                }else{
+                    slideToright()
+                    is_check_nav=true
+                }
+//             is_check_nav=true
+//            slideToright()
+            }
+//            R.id.change_view -> showViewDialog()
             R.id.go_to_today -> goToToday()
             R.id.filter -> showFilterDialog()
             R.id.refresh_caldav_calendars -> refreshCalDAVCalendars(true)
-            R.id.add_holidays -> addHolidays()
-            R.id.add_birthdays -> tryAddBirthdays()
-            R.id.add_anniversaries -> tryAddAnniversaries()
-            R.id.import_events -> tryImportEvents()
-            R.id.export_events -> tryExportEvents()
-            R.id.settings -> launchSettings()
-            R.id.about -> launchAbout()
-            R.id.logout -> logout()
+//            R.id.add_holidays -> addHolidays()
+//            R.id.add_birthdays -> tryAddBirthdays()
+//            R.id.add_anniversaries -> tryAddAnniversaries()
+//            R.id.import_events -> tryImportEvents()
+//            R.id.export_events -> tryExportEvents()
+//            R.id.settings -> launchSettings()
+//            R.id.about -> launchAbout()
+//            R.id.logout -> logout()
             android.R.id.home -> onBackPressed()
             else -> return super.onOptionsItemSelected(item)
         }
@@ -200,11 +377,19 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     }
 
     override fun onBackPressed() {
-        if (currentFragments.size > 1) {
-            removeTopFragment()
-        } else {
-            super.onBackPressed()
+
+        if (is_check_nav){
+            slideToleft()
+            is_check_nav=false
+        }else{
+            if (currentFragments.size > 1) {
+                removeTopFragment()
+            } else {
+                super.onBackPressed()
+            }
         }
+
+
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -349,6 +534,7 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     private fun resetActionBarTitle() {
         supportActionBar?.title = getString(R.string.app_launcher_name)
         supportActionBar?.subtitle = ""
+
     }
 
     private fun showFilterDialog() {
@@ -860,4 +1046,108 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }
+
+    /////////
+
+
+    fun slideToright() {
+
+        val animate = TranslateAnimation((-rel_drawer.width).toFloat(), 0f, 0f, 0f)
+        animate.duration = 800
+        animate.fillBefore = true
+        animate.fillAfter = true
+        rel_drawer.startAnimation(animate)
+        rel_drawer.visibility = View.VISIBLE
+        animate.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+                rel_blur.visibility = View.VISIBLE
+                //playscreen_rel_anim_lay.setVisibility(View.VISIBLE);
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+
+
+                rel_drawer.clearAnimation()
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+    }
+
+    fun slideToleft() {
+
+        val animate = TranslateAnimation(0f, (-rel_drawer.width).toFloat(), 0f, 0f)
+        animate.duration = 800
+        animate.fillAfter = true
+        rel_drawer.startAnimation(animate)
+        rel_drawer.visibility = View.VISIBLE
+        animate.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+                rel_blur.visibility = View.GONE
+                rel_drawer.visibility = View.GONE
+                rel_drawer.clearAnimation()
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+    }
+
+
+     fun showMyAlertTutorial(){
+
+         val builder = AlertDialog.Builder(this@MainActivityCal)
+
+         // Set the alert dialog title
+         builder.setTitle("Alert fot tutorial")
+
+         // Display a message on alert dialog
+         builder.setMessage("Do you want to see the tutorial ?")
+
+         // Set a positive button and its click listener on alert dialog
+         builder.setPositiveButton("YES"){dialog, which ->
+             val intent = Intent(this, TourActivity::class.java)
+             startActivity(intent)
+
+             // Do something when user press the positive button
+             Toast.makeText(applicationContext,"Ok, we change the app background.",Toast.LENGTH_SHORT).show()
+
+             // Change the app background color
+//             root_layout.setBackgroundColor(Color.RED)
+         }
+
+
+         // Display a negative button on alert dialog
+         builder.setNegativeButton("No"){dialog,which ->
+            // Toast.makeText(applicationContext,"You are not agree.",Toast.LENGTH_SHORT).show()
+             launchNewEventIntent(currentFragments.last().getNewEventDayCode())
+
+         }
+
+
+         // Display a neutral button on alert dialog
+         builder.setNeutralButton("Never"){_,_ ->
+
+            tinyDB?.putBoolean(tutorial_view,true)
+
+             launchNewEventIntent(currentFragments.last().getNewEventDayCode())
+             //Toast.makeText(applicationContext,"You cancelled the dialog.",Toast.LENGTH_SHORT).show()
+         }
+
+         // Finally, make the alert dialog using builder
+         val dialog: AlertDialog = builder.create()
+
+         // Display the alert dialog on app interface
+         dialog.show()
+     }
+
+
+    //////////
 }

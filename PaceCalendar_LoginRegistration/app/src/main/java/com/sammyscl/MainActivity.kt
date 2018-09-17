@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
         if (SaveSharedPreference.getUserName(this@MainActivity).isEmpty()) {
             if (savedInstanceState == null) {
                 loadLoginFragment()
+//                val intent = Intent(applicationContext, SplashActivity::class.java)
+//                startActivity(intent)
             }
         } else {
             val intent = Intent(applicationContext, SplashActivity::class.java)

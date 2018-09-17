@@ -65,4 +65,279 @@
             app:layoutManager="com.simplemobiletools.commons.views.MyLinearLayoutManager"/>
 
     </RelativeLayout>
+
+//////////////////
+
+
+    <RelativeLayout
+        android:id="@+id/rel_main"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/rel_blur"
+        android:visibility="gone"
+        android:background="@color/fab_menu_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </RelativeLayout>
+
+
+
+
+
+    <RelativeLayout
+
+        android:visibility="invisible"
+        android:id="@+id/rel_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+        <LinearLayout
+            android:id="@+id/lin_drawer"
+
+            android:orientation="horizontal"
+            android:weightSum="5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <!--android:background="@color/color_primary"-->
+            <RelativeLayout
+                android:background="@color/sidebar"
+                android:layout_weight="4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:weightSum="5"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RelativeLayout
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <ImageView
+                            android:id="@+id/img_back"
+                            android:padding="15dp"
+                            android:src="@drawable/back_arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
+
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/lin_schedule"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Schedule"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/lin_year"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Year"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/lin_day"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Day"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:id="@+id/lin_week"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Week"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:id="@+id/lin_month"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Month"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:id="@+id/lin_team"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Team"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:id="@+id/lin_Setting"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Setting"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+
+                    <ImageView
+                        android:src="@drawable/gray_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/lin_logout"
+                        android:orientation="horizontal"
+                        android:layout_weight=".5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <TextView
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:text="Logout"
+                            android:textColor="@color/primary"
+                            android:layout_marginLeft="22dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/img_lay_remaing"
+                android:layout_weight="1.5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+
+</RelativeLayout>
+    </RelativeLayout>
+
+
+
 </android.support.design.widget.CoordinatorLayout>
