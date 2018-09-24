@@ -3,9 +3,7 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-
 const userSchema = mongoose.Schema({
-
 	name 			: String,
 	userType		: String,
 	email			: {type: String, unique: true},
