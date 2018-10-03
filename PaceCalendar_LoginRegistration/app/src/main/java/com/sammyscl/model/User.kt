@@ -1,24 +1,37 @@
 package com.sammyscl.model
 
+import java.util.Date
+
+/**
+ * Created by Abhi on 20 Jan 2018 020.
+ */
+
 class User {
+    var username: String
+    var fullName: String
+    var sessionExpiryDate: Date
 
-    var name: String? = null
-    var userType: String? = null
-    var email: String? = null
-    private var password: String? = null
-    val created_at: String? = null
-    private var newPassword: String? = null
-    private var token: String? = null
-
-    fun setPassword(password: String) {
-        this.password = password
+    fun setUsername(username: String) {
+        this.username = username
     }
 
-    fun setNewPassword(newPassword: String) {
-        this.newPassword = newPassword
+    fun setFullName(fullName: String) {
+        this.fullName = fullName
     }
 
-    fun setToken(token: String) {
-        this.token = token
+    fun setSessionExpiryDate(sessionExpiryDate: Date) {
+        this.sessionExpiryDate = sessionExpiryDate
+    }
+
+    fun getUsername(): String {
+        return username
+    }
+
+    fun getFullName(): String {
+        return fullName
+    }
+
+    fun getSessionExpiryDate(): Date {
+        return sessionExpiryDate
     }
 }
