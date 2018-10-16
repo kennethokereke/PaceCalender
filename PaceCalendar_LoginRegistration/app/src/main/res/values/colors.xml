@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#92c872</color>
-    <color name="colorPrimaryDark">#629745</color>
+    <color name="colorPrimary">#629745</color>
+    <color name="colorPrimaryDark">#92c872</color>
     <color name="colorAccent">#336919</color>
     <color name="colorDarkGrey">#455A64</color>
 
@@ -14,9 +14,9 @@
 
 
 
-    <color name="topbar">#186f72</color>
-    <color name="sidebar">#509ea0</color>
-    <color name="calender">#92c872</color>
+    <color name="topbar">#92c872</color>
+    <color name="sidebar">#336919</color>
+    <color name="calender">#629745</color>
 
 
 
