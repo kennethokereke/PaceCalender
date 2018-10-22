@@ -66,9 +66,8 @@ class SessionHandler(private val mContext: Context) {
      * @param username
      * @param fullName
      */
-    fun loginUser(username: String, fullName: String) {
-        mEditor.putString(KEY_USERNAME, username)
-        mEditor.putString(KEY_FULL_NAME, fullName)
+    fun loginUser(email: String) {
+        mEditor.putString(KEY_USERNAME, email)
         val date = Date()
 
         //Set user session for next 7 days

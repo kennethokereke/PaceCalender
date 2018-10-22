@@ -16,7 +16,6 @@ import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.fragments.ChangePasswordDialog
 import com.sammyscl.model.Response
 import com.sammyscl.model.User
-import com.sammyscl.network.NetworkUtil
 import com.sammyscl.Helpers.Constants
 
 import java.io.IOException

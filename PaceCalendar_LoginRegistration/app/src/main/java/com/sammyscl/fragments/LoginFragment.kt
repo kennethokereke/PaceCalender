@@ -47,7 +47,6 @@ class LoginFragment : Fragment() {
 
     private val KEY_STATUS = "status"
     private val KEY_MESSAGE = "message"
-    private val KEY_FULL_NAME = "full_name"
     private val KEY_USERNAME = "username"
     private val KEY_PASSWORD = "password"
     private val KEY_EMPTY = ""
@@ -112,30 +111,26 @@ class LoginFragment : Fragment() {
             e.printStackTrace()
         }
 
-        val jsArrayRequest = JsonObjectRequest(Request.Method.POST, login_url, request, Response.Listener<JSONObject> {
-                    fun onResponse(response: JSONObject) {
-                        pDialog!!.dismiss()
-                        try {
-                            //Check if user got logged in successfully
-
-                            if (response.getInt(KEY_STATUS) == 0) {
-                                session.loginUser(username!!,response.getString(KEY_FULL_NAME))
-                                goToRegister()
-                            } else {
-                                Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
+        val jsArrayRequest = JsonObjectRequest(Request.Method.POST, login_url, request,
+            Response.Listener<JSONObject> { response ->
+                pDialog!!.dismiss()
+                try {
+                    //Check if user got logged in successfully
+                    if (response.getInt(KEY_STATUS) == 0) {
+                        session.loginUser(username!!)
+                        goToRegister()
+                    } else {
+                        Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
                     }
-                }, Response.ErrorListener {
-                    fun onErrorResponse(error: VolleyError) {
-                        pDialog!!.dismiss()
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }, Response.ErrorListener { error ->
+                pDialog!!.dismiss()
 
-                        //Display error message whenever an error occurs
-                        Toast.makeText(this.context, error.getMessage(), Toast.LENGTH_SHORT).show()
-                    }
-                })
+                //Display error message whenever an error occurs
+                Toast.makeText(this.context, error.toString(), Toast.LENGTH_SHORT).show()
+            })
 
         // Access the RequestQueue through your singleton class.
         MySingleton.getInstance(this.context).addToRequestQueue(jsArrayRequest)
@@ -143,14 +138,14 @@ class LoginFragment : Fragment() {
 
     private fun validateInputs() : Boolean {
         if(KEY_EMPTY.equals(username)){
-            mEtEmail.setError("Username cannot be empty")
-            mEtEmail.requestFocus()
+            mEtEmail!!.setError("Username cannot be empty")
+            mEtEmail!!.requestFocus()
             return false
         }
 
         if(KEY_EMPTY.equals(password)){
-            mEtPassword.setError("Password cannot be empty")
-            mEtPassword.requestFocus()
+            mEtPassword!!.setError("Password cannot be empty")
+            mEtPassword!!.requestFocus()
             return false
         }
         return true

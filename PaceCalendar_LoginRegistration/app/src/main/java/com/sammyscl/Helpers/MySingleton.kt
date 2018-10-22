@@ -18,9 +18,9 @@ class MySingleton private constructor(context: Context) {
     val requestQueue: RequestQueue
         get() {
             if (mRequestQueue == null) {
-                mRequestQueue = Volley.newRequestQueue(mCtx.applicationContext)
+                mRequestQueue = Volley.newRequestQueue(mCtx!!.applicationContext)
             }
-            return mRequestQueue
+            return mRequestQueue!!
         }
 
     init {
@@ -34,14 +34,14 @@ class MySingleton private constructor(context: Context) {
 
     companion object {
         private var mInstance: MySingleton? = null
-        private var mCtx: Context
+        private var mCtx: Context? = null
 
         @Synchronized
         fun getInstance(context: Context): MySingleton {
             if (mInstance == null) {
                 mInstance = MySingleton(context)
             }
-            return mInstance
+            return mInstance!!
         }
     }
 }

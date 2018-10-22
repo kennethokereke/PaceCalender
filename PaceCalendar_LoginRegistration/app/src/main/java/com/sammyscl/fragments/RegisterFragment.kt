@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -19,18 +20,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.sammyscl.Helpers.MySingleton
 import com.sammyscl.R
-import com.sammyscl.model.Response
-import com.sammyscl.model.User
 
-import java.io.IOException
-
-import retrofit2.adapter.rxjava.HttpException
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subscriptions.CompositeSubscription
-
-import com.sammyscl.Helpers.Validation.validateEmail
-import com.sammyscl.Helpers.Validation.validateFields
 import com.sammyscl.network.SessionHandler
 
 import org.json.JSONObject
@@ -54,8 +44,8 @@ class RegisterFragment : Fragment() {
     private var mTiPassword: TextInputLayout? = null
     private var mProgressbar: ProgressBar? = null
     private var pDialog: ProgressDialog? = null
-    private val email : String? = null
-    private val password : String? = null
+    private var email : String? = null
+    private var password : String? = null
 
     private val register_url = "http://10.0.0.2:8080/api/member/register.php"
     private var session = SessionHandler(this.context)
@@ -79,16 +69,14 @@ class RegisterFragment : Fragment() {
         mProgressbar = v.findViewById<View>(R.id.progress) as ProgressBar
         mTvLogin!!.setOnClickListener { view -> goToLogin() }
 
-        mBtRegister!!.setOnClickListener(
-            fun onClick(v: View) {
-                //Retrieve the data entered in the edit texts
-                email = mEtEmail!!.getText().toString().toLowerCase().trim()
-                password = mEtPassword!!.getText().toString().trim()
-                if (validateInputs()) {
-                    registerUser()
-                }
+        mBtRegister!!.setOnClickListene r{ v ->
+            //Retrieve the data entered in the edit texts
+            email = mEtEmail!!.getText().toString().toLowerCase().trim()
+            password = mEtPassword!!.getText().toString().trim()
+            if (validateInputs()) {
+                registerUser()
             }
-        )
+        }
     }
 
     fun displayLoader() {
@@ -110,39 +98,33 @@ class RegisterFragment : Fragment() {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request, Response.Listener<JSONObject> {
-                    fun onResponse(response: JSONObject) {
-                        pDialog.dismiss()
-                        try {
-                            //Check if user got registered successfully
-                            if (response.getInt(KEY_STATUS) == 0) {
-                                //Set the user session
-                                session.loginUser(email)
-                                goToLogin()
+        val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request,
+            Response.Listener<JSONObject> {response ->
+                pDialog!!.dismiss()
+                try {
+                    //Check if user got registered successfully
+                    if (response.getInt(KEY_STATUS) == 0) {
+                        //Set the user session
+                        session.loginUser(email!!)
+                        goToLogin()
+                    } else if(response.getInt(KEY_STATUS) == 1) {
+                        //Display error message if email is already existing
+                        mEtEmail!!.setError("Username already taken!")
+                        mEtEmail!!.requestFocus()
 
-                            } else if(response.getInt(KEY_STATUS) == 1) {
-                                //Display error message if email is already existing
-                                mEtEmail.setError("Username already taken!")
-                                mEtEmail.requestFocus()
-
-                            } else {
-                                Toast.makeText(context,
-                                        response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace()
-                        }
+                    } else {
+                        Toast.makeText(this.context,
+                                response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
                     }
-                }, Response.ErrorListener {
-                    fun onErrorResponse(error: VolleyError) {
-                        pDialog!!.dismiss()
+                } catch (e : JSONException) {
+                    e.printStackTrace()
+                }
+            }, Response.ErrorListener { error ->
+                pDialog!!.dismiss()
 
-                        //Display error message whenever an error occurs
-                        Toast.makeText(context,
-                                error.getMessage(), Toast.LENGTH_SHORT).show()
-
-                    }
-                })
+                //Display error message whenever an error occurs
+                Toast.makeText(this.context, error.toString(), Toast.LENGTH_SHORT).show()
+            })
 
         // Access the RequestQueue through your singleton class.
         MySingleton.getInstance(this.context).addToRequestQueue(jsArrayRequest)
