@@ -10,12 +10,13 @@ import android.view.View
 import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.calendar.activities.SplashActivity
 import com.sammyscl.fragments.LoginFragment
-import com.sammyscl.fragments.ResetPasswordDialog
+//import com.sammyscl.fragments.ResetPasswordDialog
 
-class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
+//class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
+class MainActivity : AppCompatActivity() {
 
     private var mLoginFragment: LoginFragment? = null
-    private var mResetPasswordDialog: ResetPasswordDialog? = null
+//    private var mResetPasswordDialog: ResetPasswordDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +48,15 @@ class MainActivity : AppCompatActivity(), ResetPasswordDialog.Listener {
         val data = intent.data!!.lastPathSegment
         Log.d(TAG, "onNewIntent: $data")
 
-        mResetPasswordDialog = fragmentManager.findFragmentByTag(ResetPasswordDialog.TAG) as ResetPasswordDialog
-
-        if (mResetPasswordDialog != null)
-            mResetPasswordDialog!!.setToken(data)
+//        mResetPasswordDialog = fragmentManager.findFragmentByTag(ResetPasswordDialog.TAG) as ResetPasswordDialog
+//
+//        if (mResetPasswordDialog != null)
+//            mResetPasswordDialog!!.setToken(data)
     }
 
-    override fun onPasswordReset(message: String?) {
-        showSnackBarMessage(message)
-    }
+//    override fun onPasswordReset(message: String?) {
+//        showSnackBarMessage(message)
+//    }
 
     private fun showSnackBarMessage(message: String?) {
         Snackbar.make(findViewById<View>(R.id.activity_main), message!!, Snackbar.LENGTH_SHORT).show()

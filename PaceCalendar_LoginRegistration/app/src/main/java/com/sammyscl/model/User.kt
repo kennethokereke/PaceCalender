@@ -7,31 +7,15 @@ import java.util.Date
  */
 
 class User {
-    var username: String
-    var fullName: String
-    var sessionExpiryDate: Date
+    var email: String? = null
+        get() = this.email
+        set(value) {
+            email = value
+        }
 
-    fun setUsername(username: String) {
-        this.username = username
-    }
-
-    fun setFullName(fullName: String) {
-        this.fullName = fullName
-    }
-
-    fun setSessionExpiryDate(sessionExpiryDate: Date) {
-        this.sessionExpiryDate = sessionExpiryDate
-    }
-
-    fun getUsername(): String {
-        return username
-    }
-
-    fun getFullName(): String {
-        return fullName
-    }
-
-    fun getSessionExpiryDate(): Date {
-        return sessionExpiryDate
+    var sessionExpiryDate: Date? = null
+        get() = this.sessionExpiryDate
+        set(value) {
+            this.sessionExpiryDate = value
     }
 }

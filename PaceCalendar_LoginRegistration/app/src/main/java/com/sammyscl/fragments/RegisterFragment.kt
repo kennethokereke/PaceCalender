@@ -69,7 +69,7 @@ class RegisterFragment : Fragment() {
         mProgressbar = v.findViewById<View>(R.id.progress) as ProgressBar
         mTvLogin!!.setOnClickListener { view -> goToLogin() }
 
-        mBtRegister!!.setOnClickListene r{ v ->
+        mBtRegister!!.setOnClickListener { _ ->
             //Retrieve the data entered in the edit texts
             email = mEtEmail!!.getText().toString().toLowerCase().trim()
             password = mEtPassword!!.getText().toString().trim()
@@ -79,7 +79,7 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    fun displayLoader() {
+    private fun displayLoader() {
         pDialog = ProgressDialog(this.context)
         pDialog!!.setMessage("Signing Up.. Please wait...")
         pDialog!!.setIndeterminate(false)
@@ -87,17 +87,18 @@ class RegisterFragment : Fragment() {
         pDialog!!.show()
     }
 
-    fun registerUser() {
+    private fun registerUser() {
         displayLoader()
         val request = JSONObject()
+
         try {
             //Populate the request parameters
             request.put(KEY_USERNAME, email)
             request.put(KEY_PASSWORD, password)
-
         } catch (e: JSONException) {
             e.printStackTrace()
         }
+
         val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request,
             Response.Listener<JSONObject> {response ->
                 pDialog!!.dismiss()
@@ -111,7 +112,6 @@ class RegisterFragment : Fragment() {
                         //Display error message if email is already existing
                         mEtEmail!!.setError("Username already taken!")
                         mEtEmail!!.requestFocus()
-
                     } else {
                         Toast.makeText(this.context,
                                 response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
@@ -130,7 +130,7 @@ class RegisterFragment : Fragment() {
         MySingleton.getInstance(this.context).addToRequestQueue(jsArrayRequest)
     }
 
-    fun validateInputs(): Boolean {
+    private fun validateInputs(): Boolean {
         if (KEY_EMPTY.equals(mEtEmail)) {
             mEtEmail!!.setError("Username cannot be empty")
             mEtEmail!!.requestFocus()
