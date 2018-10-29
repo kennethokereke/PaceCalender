@@ -1,10 +1,8 @@
 package com.sammyscl.fragments
 
 import android.app.Fragment
-import android.app.FragmentTransaction
 import android.app.ProgressDialog
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputLayout
 import android.view.LayoutInflater
 import android.view.View
@@ -12,13 +10,9 @@ import android.view.ViewGroup
 import android.widget.*
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.sammyscl.Helpers.MySingleton
+import com.sammyscl.helpers.MySingleton
 import com.sammyscl.R
 
 import com.sammyscl.network.SessionHandler

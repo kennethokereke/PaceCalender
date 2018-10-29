@@ -8,14 +8,5 @@ import java.util.Date
 
 class User {
     var email: String? = null
-        get() = this.email
-        set(value) {
-            email = value
-        }
-
     var sessionExpiryDate: Date? = null
-        get() = this.sessionExpiryDate
-        set(value) {
-            this.sessionExpiryDate = value
-    }
 }

@@ -48,8 +48,8 @@ class SessionHandler(private val mContext: Context) {
                 return null
             }
             val user = User()
-            user.email.set(mPreferences.getString(KEY_USERNAME, KEY_EMPTY))
-            user.sessionExpiryDate.set(Date(mPreferences.getLong(KEY_EXPIRES, 0)))
+            user.email = mPreferences.getString(KEY_USERNAME, KEY_EMPTY)
+            user.sessionExpiryDate = Date(mPreferences.getLong(KEY_EXPIRES, 0))
 
             return user
         }

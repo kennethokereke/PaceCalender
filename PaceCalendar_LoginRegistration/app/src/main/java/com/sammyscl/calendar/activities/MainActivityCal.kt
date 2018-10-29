@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo
 import android.database.ContentObserver
 import android.database.Cursor
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -27,8 +26,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.sammyscl.BuildConfig
-import com.sammyscl.Helpers.Constants
-import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.R
 import com.sammyscl.TinyDB
 
