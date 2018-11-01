@@ -1,39 +1,32 @@
 package com.sammyscl.fragments
 
 import android.app.Fragment
-import android.app.FragmentTransaction
+import android.app.ProgressDialog
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.sammyscl.helpers.MySingleton
 import com.sammyscl.R
-import com.sammyscl.model.Response
-import com.sammyscl.model.User
-import com.sammyscl.network.NetworkUtil
 
-import java.io.IOException
+import com.sammyscl.network.SessionHandler
 
-import retrofit2.adapter.rxjava.HttpException
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subscriptions.CompositeSubscription
-
-import com.sammyscl.Helpers.Validation.validateEmail
-import com.sammyscl.Helpers.Validation.validateFields
+import org.json.JSONObject
+import org.json.JSONException
 
 class RegisterFragment : Fragment() {
-
+    private val KEY_STATUS = "status"
+    private val KEY_MESSAGE = "message"
+    private val KEY_FULL_NAME = "full_name"
+    private val KEY_USERNAME = "email"
+    private val KEY_PASSWORD = "password"
+    private val KEY_EMPTY = ""
     private var mEtName: EditText? = null
     private var mSpUserType: Spinner? = null
     private var mEtEmail: EditText? = null
@@ -44,19 +37,20 @@ class RegisterFragment : Fragment() {
     private var mTiEmail: TextInputLayout? = null
     private var mTiPassword: TextInputLayout? = null
     private var mProgressbar: ProgressBar? = null
+    private var pDialog: ProgressDialog? = null
+    private var email : String? = null
+    private var password : String? = null
 
-    private var mSubscriptions: CompositeSubscription? = null
+    private val register_url = "http://10.0.0.2:8080/api/member/register.php"
+    private var session = SessionHandler(this.context)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         val view = inflater.inflate(R.layout.fragment_register, container, false)
-        mSubscriptions = CompositeSubscription()
         initViews(view)
         return view
     }
 
     private fun initViews(v: View) {
-
         mEtName = v.findViewById<View>(R.id.et_name) as EditText
         mSpUserType = v.findViewById<View>(R.id.sp_userType) as Spinner
         mEtEmail = v.findViewById<View>(R.id.et_email) as EditText
@@ -67,122 +61,82 @@ class RegisterFragment : Fragment() {
         mTiEmail = v.findViewById<View>(R.id.ti_email) as TextInputLayout
         mTiPassword = v.findViewById<View>(R.id.ti_password) as TextInputLayout
         mProgressbar = v.findViewById<View>(R.id.progress) as ProgressBar
-
-        mBtRegister!!.setOnClickListener { view -> register() }
         mTvLogin!!.setOnClickListener { view -> goToLogin() }
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        val adapter = ArrayAdapter.createFromResource(v.context,
-                R.array.userTypes, android.R.layout.simple_spinner_item)
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // Apply the adapter to the spinner
-        mSpUserType!!.adapter = adapter
-
-        //        mSpUserType.setOnItemSelectedListener(this);
-
-    }
-
-    //    @Override
-    //    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    //        // Don't do anything
-    //    }
-    //    public void onNothingSelected(AdapterView<?> arg0) {
-    //        // Don't do anything
-    //    }
-
-    private fun register() {
-        setError()
-
-        val name = mEtName!!.text.toString()
-        val userType = mSpUserType!!.selectedItem.toString()
-        val email = mEtEmail!!.text.toString()
-        val password = mEtPassword!!.text.toString()
-
-        var err = 0
-
-        if (!validateFields(name)) {
-
-            err++
-            mTiName!!.error = "Name should not be empty !"
-        }
-
-        if (!validateFields(userType)) {
-            err++
-
-        }
-
-        if (!validateEmail(email)) {
-
-            err++
-            mTiEmail!!.error = "Email should be valid !"
-        }
-
-        if (!validateFields(password)) {
-
-            err++
-            mTiPassword!!.error = "Password should not be empty !"
-        }
-
-        if (err == 0) {
-
-            val user = User()
-            user.name = name
-            user.userType = userType
-            user.email = email
-            user.setPassword(password)
-
-            mProgressbar!!.visibility = View.VISIBLE
-            registerProcess(user)
-
-        } else {
-
-            showSnackBarMessage("Enter Valid Details !")
-        }
-    }
-
-    private fun setError() {
-        mTiName!!.error = null
-        mTiEmail!!.error = null
-        mTiPassword!!.error = null
-    }
-
-    private fun registerProcess(user: User) {
-        mSubscriptions!!.add(NetworkUtil.retrofit.register(user)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(this::handleResponse, this::handleError))
-    }
-
-    private fun handleResponse(response: Response) {
-        mProgressbar!!.visibility = View.GONE
-        showSnackBarMessage(response.message)
-    }
-
-    private fun handleError(error: Throwable) {
-        mProgressbar!!.visibility = View.GONE
-
-        if (error is HttpException) {
-            val gson = GsonBuilder().create()
-            try {
-                val errorBody = error.response().errorBody().string()
-                val response = gson.fromJson<Response>(errorBody, Response::class.java!!)
-                showSnackBarMessage(response.message)
-            } catch (e: IOException) {
-                e.printStackTrace()
+        mBtRegister!!.setOnClickListener { _ ->
+            //Retrieve the data entered in the edit texts
+            email = mEtEmail!!.getText().toString().toLowerCase().trim()
+            password = mEtPassword!!.getText().toString().trim()
+            if (validateInputs()) {
+                registerUser()
             }
-
-        } else {
-            showSnackBarMessage("Network Error !")
         }
     }
 
-    private fun showSnackBarMessage(message: String?) {
-        if (view != null) {
-            Snackbar.make(view!!, message!!, Snackbar.LENGTH_SHORT).show()
+    private fun displayLoader() {
+        pDialog = ProgressDialog(this.context)
+        pDialog!!.setMessage("Signing Up.. Please wait...")
+        pDialog!!.setIndeterminate(false)
+        pDialog!!.setCancelable(false)
+        pDialog!!.show()
+    }
+
+    private fun registerUser() {
+        displayLoader()
+        val request = JSONObject()
+
+        try {
+            //Populate the request parameters
+            request.put(KEY_USERNAME, email)
+            request.put(KEY_PASSWORD, password)
+        } catch (e: JSONException) {
+            e.printStackTrace()
         }
+
+        val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request,
+            Response.Listener<JSONObject> {response ->
+                pDialog!!.dismiss()
+                try {
+                    //Check if user got registered successfully
+                    if (response.getInt(KEY_STATUS) == 0) {
+                        //Set the user session
+                        session.loginUser(email!!)
+                        goToLogin()
+                    } else if(response.getInt(KEY_STATUS) == 1) {
+                        //Display error message if email is already existing
+                        mEtEmail!!.setError("Username already taken!")
+                        mEtEmail!!.requestFocus()
+                    } else {
+                        Toast.makeText(this.context,
+                                response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e : JSONException) {
+                    e.printStackTrace()
+                }
+            }, Response.ErrorListener { error ->
+                pDialog!!.dismiss()
+
+                //Display error message whenever an error occurs
+                Toast.makeText(this.context, error.toString(), Toast.LENGTH_SHORT).show()
+            })
+
+        // Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(this.context).addToRequestQueue(jsArrayRequest)
+    }
+
+    private fun validateInputs(): Boolean {
+        if (KEY_EMPTY.equals(mEtEmail)) {
+            mEtEmail!!.setError("Username cannot be empty")
+            mEtEmail!!.requestFocus()
+            return false
+        }
+        if (KEY_EMPTY.equals(mEtPassword)) {
+            mEtPassword!!.setError("Password cannot be empty")
+            mEtPassword!!.requestFocus()
+            return false
+        }
+
+        return true
     }
 
     private fun goToLogin() {
@@ -192,15 +146,8 @@ class RegisterFragment : Fragment() {
         ft.commit()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mSubscriptions!!.unsubscribe()
-    }
-
     companion object {
-        //    public class RegisterFragment extends Fragment implements AdapterView.OnItemSelectedListener{
-
-        val TAG = RegisterFragment::class.java!!.getSimpleName()
+        val TAG = RegisterFragment::class.java.getSimpleName()
     }
 }
 

@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo
 import android.database.ContentObserver
 import android.database.Cursor
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -27,8 +26,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.sammyscl.BuildConfig
-import com.sammyscl.Helpers.Constants
-import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.R
 import com.sammyscl.TinyDB
 
@@ -44,6 +41,7 @@ import com.sammyscl.calendar.helpers.Formatter
 import com.sammyscl.calendar.models.Event
 import com.sammyscl.calendar.models.EventType
 import com.sammyscl.calendar.models.ListEvent
+import com.sammyscl.network.SessionHandler
 import com.sammyscl.tutorial.TourActivity
 import com.sammyscl.tutorial.TutActivity
 import com.simplemobiletools.commons.dialogs.FilePickerDialog
@@ -105,6 +103,8 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
 
     internal lateinit var img_nav: ImageView
     internal lateinit var img_back:ImageView
+
+    var session : SessionHandler = SessionHandler(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -368,12 +368,7 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     }
 
     private fun logout() {
-        val editor = mSharedPreferences!!.edit()
-        editor.putString(Constants.EMAIL, "")
-        editor.putString(Constants.TOKEN, "")
-        editor.apply()
-        SaveSharedPreference.setUserName(applicationContext, "")
-        finish()
+        session.logoutUser()
     }
 
     override fun onBackPressed() {

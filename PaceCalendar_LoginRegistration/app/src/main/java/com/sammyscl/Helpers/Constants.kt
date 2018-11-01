@@ -1,4 +1,4 @@
-package com.sammyscl.Helpers
+package com.sammyscl.helpers
 
 object Constants {
 

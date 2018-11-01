@@ -1,4 +1,4 @@
-package com.sammyscl.Helpers
+package com.sammyscl.helpers
 
 import android.text.TextUtils
 import android.util.Patterns
