@@ -3,15 +3,15 @@ $random_salt_length = 32;
 /**
 * Queries the database and checks whether the user already exists
 *
-* @param $username
+* @param $email
 *
 * @return
 */
-function userExists($username) {
-    $query = "SELECT username FROM member WHERE username = ?";
+function userExists($email) {
+    $query = "SELECT email FROM member WHERE email = ?";
     global $con;
     if ($stmt = $con->prepare($query)) {
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
         $stmt->fetch();

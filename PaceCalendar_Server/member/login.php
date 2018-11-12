@@ -8,13 +8,13 @@ $inputJSON = file_get_contents('php://input');
 $input = json_decode($inputJSON, true); //convert JSON into array
 
 //Check for Mandatory parameters
-if (isset($input['username']) && isset($input['password'])) {
-    $username = $input['username'];
+if (isset($input['email']) && isset($input['password'])) {
+    $email = $input['email'];
     $password = $input['password'];
-    $query    = "SELECT full_name,password_hash, salt FROM member WHERE username = ?";
+    $query    = "SELECT full_name,password_hash, salt FROM member WHERE email = ?";
 
     if ($stmt = $con->prepare($query)) {
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->bind_result($fullName, $passwordHashDB, $salt);
         if ($stmt->fetch()) {
@@ -25,11 +25,11 @@ if (isset($input['username']) && isset($input['password'])) {
                 $response["full_name"] = $fullName;
             } else {
                 $response["status"] = 1;
-                $response["message"] = "Invalid username and password combination";
+                $response["message"] = "Invalid email and password combination";
             }
         } else {
             $response["status"] = 1;
-            $response["message"] = "Invalid username and password combination";
+            $response["message"] = "Invalid email and password combination";
         }
 
         $stmt->close();

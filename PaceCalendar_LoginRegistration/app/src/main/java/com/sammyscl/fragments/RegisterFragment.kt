@@ -26,6 +26,7 @@ class RegisterFragment : Fragment() {
     private val KEY_FULL_NAME = "full_name"
     private val KEY_USERNAME = "email"
     private val KEY_PASSWORD = "password"
+    private val KEY_USERTYPE = "user_type"
     private val KEY_EMPTY = ""
     private var mEtName: EditText? = null
     private var mSpUserType: Spinner? = null
@@ -38,14 +39,17 @@ class RegisterFragment : Fragment() {
     private var mTiPassword: TextInputLayout? = null
     private var mProgressbar: ProgressBar? = null
     private var pDialog: ProgressDialog? = null
+    private var fullName : String? = null
     private var email : String? = null
     private var password : String? = null
+    private var userType : String? = null
 
-    private val register_url = "http://10.0.0.2:8080/api/member/register.php"
-    private var session = SessionHandler(this.context)
+    private val register_url = "http://10.0.2.2:8888/member/register.php"
+    private var session : SessionHandler ?= null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_register, container, false)
+        session = SessionHandler(this.context)
         initViews(view)
         return view
     }
@@ -63,14 +67,26 @@ class RegisterFragment : Fragment() {
         mProgressbar = v.findViewById<View>(R.id.progress) as ProgressBar
         mTvLogin!!.setOnClickListener { view -> goToLogin() }
 
-        mBtRegister!!.setOnClickListener { _ ->
+        mBtRegister!!.setOnClickListener {
             //Retrieve the data entered in the edit texts
+            fullName = mEtName!!.getText().toString()
+            userType = mSpUserType!!.selectedItem.toString()
             email = mEtEmail!!.getText().toString().toLowerCase().trim()
             password = mEtPassword!!.getText().toString().trim()
             if (validateInputs()) {
                 registerUser()
             }
         }
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        val adapter = ArrayAdapter.createFromResource(v.context,
+                R.array.userTypes, android.R.layout.simple_spinner_item)
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // Apply the adapter to the spinner
+        mSpUserType!!.adapter = adapter
     }
 
     private fun displayLoader() {
@@ -87,6 +103,8 @@ class RegisterFragment : Fragment() {
 
         try {
             //Populate the request parameters
+            request.put(KEY_FULL_NAME, fullName)
+            request.put(KEY_USERTYPE, userType)
             request.put(KEY_USERNAME, email)
             request.put(KEY_PASSWORD, password)
         } catch (e: JSONException) {
@@ -94,21 +112,18 @@ class RegisterFragment : Fragment() {
         }
 
         val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request,
-            Response.Listener<JSONObject> {response ->
+            Response.Listener<JSONObject> { response ->
                 pDialog!!.dismiss()
                 try {
                     //Check if user got registered successfully
                     if (response.getInt(KEY_STATUS) == 0) {
-                        //Set the user session
-                        session.loginUser(email!!)
                         goToLogin()
                     } else if(response.getInt(KEY_STATUS) == 1) {
                         //Display error message if email is already existing
                         mEtEmail!!.setError("Username already taken!")
                         mEtEmail!!.requestFocus()
                     } else {
-                        Toast.makeText(this.context,
-                                response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e : JSONException) {
                     e.printStackTrace()
@@ -130,9 +145,16 @@ class RegisterFragment : Fragment() {
             mEtEmail!!.requestFocus()
             return false
         }
+
         if (KEY_EMPTY.equals(mEtPassword)) {
             mEtPassword!!.setError("Password cannot be empty")
             mEtPassword!!.requestFocus()
+            return false
+        }
+
+        if(KEY_EMPTY.equals(mEtName)) {
+            mEtName!!.setError("Full name cannot be empty")
+            mEtName!!.requestFocus()
             return false
         }
 

@@ -6,7 +6,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputLayout
 import android.view.LayoutInflater
@@ -61,11 +60,12 @@ class LoginFragment : Fragment() {
     private val username: String? = null
     private val password: String? = null
 
-    private var login_url : String = "http://192.168.43.72:8888/api/member/login.php"
-    private var session = SessionHandler(this.context)
+    private var login_url: String = "http://10.0.2.2:8888/member/login.php"
+    private var session: SessionHandler ?= null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
+        session = SessionHandler(this.context)
         initViews(view)
         return view
     }
@@ -112,7 +112,7 @@ class LoginFragment : Fragment() {
                 try {
                     //Check if user got logged in successfully
                     if (response.getInt(KEY_STATUS) == 0) {
-                        session.loginUser(username!!)
+                        session!!.loginUser(username!!)
                         goToRegister()
                     } else {
                         Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()

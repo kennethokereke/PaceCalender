@@ -8,13 +8,14 @@ $inputJSON = file_get_contents('php://input');
 $input = json_decode($inputJSON, true); //convert JSON into array
 
 //Check for Mandatory parameters
-if (isset($input['username']) && isset($input['password']) && isset($input['full_name'])) {
-    $username = $input['username'];
+if (isset($input['email']) && isset($input['password']) && isset($input['full_name']) && isset($input['user_type'])) {
+    $email = $input['email'];
     $password = $input['password'];
     $fullName = $input['full_name'];
+    $userType = $input['user_type']
 
     //Check if user already exist
-    if (!userExists($username)) {
+    if (!userExists($email)) {
 
         //Get a unique Salt
         $salt         = getSalt();
@@ -23,9 +24,9 @@ if (isset($input['username']) && isset($input['password']) && isset($input['full
         $passwordHash = password_hash(concatPasswordWithSalt($password, $salt), PASSWORD_DEFAULT);
 
         //Query to register new user
-        $insertQuery  = "INSERT INTO member(username, full_name, password_hash, salt) VALUES (?,?,?,?)";
+        $insertQuery  = "INSERT INTO member(email, full_name, password_hash, salt, user_type) VALUES (?,?,?,?,?)";
         if ($stmt = $con->prepare($insertQuery)) {
-            $stmt->bind_param("ssss", $username, $fullName, $passwordHash, $salt);
+            $stmt->bind_param("sssss", $email, $fullName, $passwordHash, $salt, $userType);
             $stmt->execute();
             $response["status"] = 0;
             $response["message"] = "User created";
