@@ -1,7 +1,7 @@
 <?php
 define('DB_USER', "root"); // db user
 define('DB_PASSWORD', ""); // db password (mention your db password here)
-define('DB_DATABASE', "careweaver_login"); // database name
+define('DB_DATABASE', "careweaver"); // database name
 define('DB_SERVER', "localhost"); // db server
 
 $con = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);

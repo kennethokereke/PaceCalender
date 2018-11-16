@@ -24,9 +24,9 @@ if (isset($input['email']) && isset($input['password']) && isset($input['full_na
         $passwordHash = password_hash(concatPasswordWithSalt($password, $salt), PASSWORD_DEFAULT);
 
         //Query to register new user
-        $insertQuery  = "INSERT INTO member(email, full_name, password_hash, salt, user_type) VALUES (?,?,?,?,?)";
+        $insertQuery  = "INSERT INTO users(email, full_name, user_type, password_hash, salt) VALUES (?,?,?,?,?)";
         if ($stmt = $con->prepare($insertQuery)) {
-            $stmt->bind_param("sssss", $email, $fullName, $passwordHash, $salt, $userType);
+            $stmt->bind_param("sssss", $email, $fullName, $userType, $passwordHash, $salt);
             $stmt->execute();
             $response["status"] = 0;
             $response["message"] = "User created";

@@ -11,7 +11,7 @@ $input = json_decode($inputJSON, true); //convert JSON into array
 if (isset($input['email']) && isset($input['password'])) {
     $email = $input['email'];
     $password = $input['password'];
-    $query    = "SELECT full_name,password_hash, salt FROM member WHERE email = ?";
+    $query    = "SELECT full_name,password_hash, salt FROM users WHERE email = ?";
 
     if ($stmt = $con->prepare($query)) {
         $stmt->bind_param("s", $email);

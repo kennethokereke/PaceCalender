@@ -1,7 +1,6 @@
 package com.sammyscl.fragments
 
 import android.app.Fragment
-import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.view.LayoutInflater
@@ -38,7 +37,6 @@ class RegisterFragment : Fragment() {
     private var mTiEmail: TextInputLayout? = null
     private var mTiPassword: TextInputLayout? = null
     private var mProgressbar: ProgressBar? = null
-    private var pDialog: ProgressDialog? = null
     private var fullName : String? = null
     private var email : String? = null
     private var password : String? = null
@@ -65,7 +63,17 @@ class RegisterFragment : Fragment() {
         mTiEmail = v.findViewById<View>(R.id.ti_email) as TextInputLayout
         mTiPassword = v.findViewById<View>(R.id.ti_password) as TextInputLayout
         mProgressbar = v.findViewById<View>(R.id.progress) as ProgressBar
-        mTvLogin!!.setOnClickListener { view -> goToLogin() }
+        mTvLogin!!.setOnClickListener { goToLogin() }
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        val adapter = ArrayAdapter.createFromResource(v.context,
+                R.array.userTypes, android.R.layout.simple_spinner_item)
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // Apply the adapter to the spinner
+        mSpUserType!!.adapter = adapter
 
         mBtRegister!!.setOnClickListener {
             //Retrieve the data entered in the edit texts
@@ -77,28 +85,9 @@ class RegisterFragment : Fragment() {
                 registerUser()
             }
         }
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        val adapter = ArrayAdapter.createFromResource(v.context,
-                R.array.userTypes, android.R.layout.simple_spinner_item)
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // Apply the adapter to the spinner
-        mSpUserType!!.adapter = adapter
-    }
-
-    private fun displayLoader() {
-        pDialog = ProgressDialog(this.context)
-        pDialog!!.setMessage("Signing Up.. Please wait...")
-        pDialog!!.setIndeterminate(false)
-        pDialog!!.setCancelable(false)
-        pDialog!!.show()
     }
 
     private fun registerUser() {
-        displayLoader()
         val request = JSONObject()
 
         try {
@@ -113,7 +102,6 @@ class RegisterFragment : Fragment() {
 
         val jsArrayRequest = JsonObjectRequest(Request.Method.POST, register_url, request,
             Response.Listener<JSONObject> { response ->
-                pDialog!!.dismiss()
                 try {
                     //Check if user got registered successfully
                     if (response.getInt(KEY_STATUS) == 0) {
@@ -129,8 +117,6 @@ class RegisterFragment : Fragment() {
                     e.printStackTrace()
                 }
             }, Response.ErrorListener { error ->
-                pDialog!!.dismiss()
-
                 //Display error message whenever an error occurs
                 Toast.makeText(this.context, error.toString(), Toast.LENGTH_SHORT).show()
             })
