@@ -1,6 +1,6 @@
 <?php
 $response = array();
-include 'db/db_connect.php';
+include 'db_connect.php';
 include 'functions.php';
 
 //Get the input request parameters
@@ -12,11 +12,10 @@ if (isset($input['email']) && isset($input['password']) && isset($input['full_na
     $email = $input['email'];
     $password = $input['password'];
     $fullName = $input['full_name'];
-    $userType = $input['user_type']
+    $userType = $input['user_type'];
 
     //Check if user already exist
     if (!userExists($email)) {
-
         //Get a unique Salt
         $salt         = getSalt();
 

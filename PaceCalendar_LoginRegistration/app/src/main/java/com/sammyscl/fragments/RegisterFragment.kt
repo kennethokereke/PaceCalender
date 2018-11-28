@@ -22,8 +22,8 @@ import org.json.JSONException
 class RegisterFragment : Fragment() {
     private val KEY_STATUS = "status"
     private val KEY_MESSAGE = "message"
-    private val KEY_FULL_NAME = "full_name"
-    private val KEY_USERNAME = "email"
+    private val KEY_FULLNAME = "full_name"
+    private val KEY_EMAIL = "email"
     private val KEY_PASSWORD = "password"
     private val KEY_USERTYPE = "user_type"
     private val KEY_EMPTY = ""
@@ -92,9 +92,9 @@ class RegisterFragment : Fragment() {
 
         try {
             //Populate the request parameters
-            request.put(KEY_FULL_NAME, fullName)
+            request.put(KEY_FULLNAME, fullName)
             request.put(KEY_USERTYPE, userType)
-            request.put(KEY_USERNAME, email)
+            request.put(KEY_EMAIL, email)
             request.put(KEY_PASSWORD, password)
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -104,14 +104,18 @@ class RegisterFragment : Fragment() {
             Response.Listener<JSONObject> { response ->
                 try {
                     //Check if user got registered successfully
-                    if (response.getInt(KEY_STATUS) == 0) {
-                        goToLogin()
-                    } else if(response.getInt(KEY_STATUS) == 1) {
-                        //Display error message if email is already existing
-                        mEtEmail!!.setError("Username already taken!")
-                        mEtEmail!!.requestFocus()
-                    } else {
-                        Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
+                    when(response.getInt(KEY_STATUS)) {
+                        0 -> {
+                            goToLogin()
+                            Toast.makeText(this.context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                        }
+                        1 -> {
+                            //Display error message if email is already existing
+                            mEtEmail!!.setError("Username already taken!")
+                            mEtEmail!!.requestFocus()
+                        } else -> {
+                            Toast.makeText(this.context, response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } catch (e : JSONException) {
                     e.printStackTrace()

@@ -1,6 +1,5 @@
 package com.sammyscl
 
-import android.content.Context
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -8,7 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 
-import com.sammyscl.helpers.SaveSharedPreference
+import com.sammyscl.Helpers.SaveSharedPreference
 import com.sammyscl.calendar.activities.SplashActivity
 import com.sammyscl.fragments.LoginFragment
 //import com.sammyscl.fragments.ResetPasswordDialog
