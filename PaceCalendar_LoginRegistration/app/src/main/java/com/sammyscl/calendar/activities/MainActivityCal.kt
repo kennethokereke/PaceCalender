@@ -104,10 +104,11 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     internal lateinit var img_nav: ImageView
     internal lateinit var img_back:ImageView
 
-    var session : SessionHandler = SessionHandler(this)
+    var session : SessionHandler ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        session = SessionHandler(this)
         setContentView(R.layout.activity_main_cal)
         appLaunched(BuildConfig.APPLICATION_ID)
 
@@ -368,7 +369,7 @@ class MainActivityCal : SimpleActivity(), RefreshRecyclerViewListener {
     }
 
     private fun logout() {
-        session.logoutUser()
+        session!!.logoutUser()
     }
 
     override fun onBackPressed() {
