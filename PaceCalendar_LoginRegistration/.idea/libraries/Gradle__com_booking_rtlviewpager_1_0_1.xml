@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.booking:rtlviewpager-1.0.1">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtlviewpager-1.0.1.aar/82e3cbf0b1bd63c22348657de6e3e85f/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtlviewpager-1.0.1.aar/82e3cbf0b1bd63c22348657de6e3e85f/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtlviewpager-1.0.1.aar/771a5b6a00a1eaac4f762197d076124b/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtlviewpager-1.0.1.aar/771a5b6a00a1eaac4f762197d076124b/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
